@@ -15,10 +15,12 @@ class LocalIEDBImmunPredictor(MHCImmunoPredictor):
     IEDB Immunogenicity tool."""
     
     def init(self, **kwargs):
-        self.attr.setdefault("executable", "predict_immunogenicity.py")
+        #self.attr.setdefault("executable", "/home/ubuntu/sahar/Epitopes_from_TCRs/IEDB_mhcI_immunogenicity/predict_immunogenicity.py")
+        self.attr.setdefault("executable", "python")
         self.attr.setdefault("tempdir", None)
     
     def can_execute(self):
+        print(self.executable)
         return check_executable(self.executable)
     
     def getEpitopePredictions(self, sequences):
