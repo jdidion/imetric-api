@@ -81,7 +81,7 @@ class MHCPeptidePredictor(Predictor):
         
         return self.getPeptidePredictions(sequences, alleles, species, **kwargs)
     
-    def predictProteins(self, sequences, lengths=None, alleles=None, species=None, **kwarg):
+    def predictProteins(self, sequences, lengths=None, alleles=None, species=None, **kwargs):
         """Predict binding between peptides within a protein sequence and one 
         or more MHC alleles. Each tool provides it's own method for deriving
         peptides from a protein; tools that do not provide such ability will
