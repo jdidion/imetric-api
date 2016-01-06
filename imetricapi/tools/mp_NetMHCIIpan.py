@@ -10,9 +10,10 @@ class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
     """MHCPeptidePredictor that calls a locally installed 
     netMHCIIpan instance."""
     
-    def init(self, executable="netMHCIIpan", tempdir=None, **kwargs):
-        LocalNetMHCPeptidePredictor.init(self, executable, tempdir, **kwargs)
+    def init(self):
         self.attr["mhc"] = (2,)
+        self.attr.setdefault("executable", "netMHCIIpan")
+        self.attr.setdefault("tempdir", None)
         
     def _reformat_alleles(self, alleles):
         return list(allele.split("-")[1].replace("*", "_") for allele in alleles)

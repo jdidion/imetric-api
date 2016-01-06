@@ -11,9 +11,10 @@ class LocalNetMHCPanPredictor(LocalNetMHCPeptidePredictor):
     """MHCPeptidePredictor that calls a locally installed 
     netMHCpan instance."""
     
-    def init(self, executable="netMHCpan", tempdir=None, **kwargs):
-        LocalNetMHCPeptidePredictor.init(self, executable, tempdir, **kwargs)
+    def init(self):
         self.attr["mhc"] = (1,)
+        self.attr.setdefault("executable", "netMHCpan")
+        self.attr.setdefault("tempdir", None)
     
     def _reformat_alleles(self, alleles):
         return list(allele.replace("*", "_") for allele in alleles)

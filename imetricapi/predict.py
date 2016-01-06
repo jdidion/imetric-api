@@ -20,18 +20,18 @@ def predictProteins(sequences, lengths=None, alleles=None, species=None,
         results[name]["result"] = pred_result
     return results
 
-class MHCPeptidePredictor(object):
-    """Base class for tools that predict MHC:peptide binding strength.
-    """
+def predictEpitopes(sequences, methods=None, config=None, **kwargs):
+    predictors = imetricapi.tools.get_MHCImmunoPredictors(methods, config)
+    results = {}
+    for name, pred in predictors.items():
+        pred_result = pred.predictEpitopes(sequences, **kwargs)
+        results[name] = pred.get_info()
+        results[name]["result"] = pred_result
+    return results
+
+class Predictor(object):
     def __init__(self, **kwargs):
-        # set defaults that can be over-ridden by subclass init()
-        self.all_alleles = None
-        self.all_species = None
-        self.attr = dict(
-            min_peptide_length=8,
-            max_peptide_length=15,
-            mhc=(1,2)
-        )
+        self.attr = {}
         self.attr.update(kwargs)
     
     def __getattr__(self, attr):
@@ -39,6 +39,19 @@ class MHCPeptidePredictor(object):
     
     def get_info(self):
         return self.attr.copy()
+
+class MHCPeptidePredictor(Predictor):
+    """Base class for tools that predict MHC:peptide binding strength.
+    """
+    def __init__(self, **kwargs):
+        # set defaults that can be over-ridden by subclass init()
+        Predictor.__init__(self, **kwargs)
+        self.all_alleles = None
+        self.all_species = None
+        self.attr["min_peptide_length"] = 8
+        self.attr["max_peptide_length"] = 15
+        self.attr["mhc"] = (1,2)
+        self.init()
     
     def supports_class(self, mhc_class):
         return mhc_class in self.mhc
@@ -178,7 +191,7 @@ class MHCPeptidePredictor(object):
     
     ## Internal methods to be implemented by subclasses ##
     
-    def init(self, **kwargs):
+    def init(self):
         pass
     
     def getPeptidePredictions(self, sequences, alleles, species, **kwargs):
@@ -196,21 +209,12 @@ class MHCPeptidePredictor(object):
         information."""
         return []
 
-def predictEpitopes(sequences, methods=None, config=None, **kwargs):
-    predictors = imetricapi.tools.get_MHCImmunoPredictors(methods, config)
-    results = dict((name, pred.predictEpitopes(sequences, **kwargs))
-        for name, pred in predictors.items())
-    return results
-    # TODO: generate consensus table from results
-
-class MHCImmunoPredictor(object):
+class MHCImmunoPredictor(Predictor):
     def __init__(self, **kwargs):
-        self.attr = dict(
-            min_peptide_length=8,
-            max_peptide_length=15,
-            mhc=(1,2)
-        )
-        self.attr.update(kwargs)
+        Predictor.__init__(self, **kwargs)
+        self.attr["min_peptide_length"] = 8
+        self.attr["max_peptide_length"] = 15
+        self.init()
     
     def predictEpitopes(self, sequences, **kwargs):
         """Predict immunogenicity of one or more epitopes.
@@ -234,5 +238,9 @@ class MHCImmunoPredictor(object):
         return sequences
                     
     ## Internal methods to be implemented by subclasses ##
+    
+    def init(self):
+        pass
+    
     def getEpitopePredictions(self, sequences, **kwargs):
         raise NotImplemented()

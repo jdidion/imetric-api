@@ -4,10 +4,6 @@ import subprocess
 from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
 class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
-    def init(self, executable, tempdir, **kwargs):
-        self.attr["executable"] = executable
-        self.attr["tempdir"] = tempdir
-    
     def getPeptidePredictions(self, sequences, alleles, species):
         if len(sequences) == 0 or len(alleles) == 0:
             # TODO: warn
