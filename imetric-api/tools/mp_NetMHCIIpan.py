@@ -14,58 +14,23 @@ class LocalNetMHCIIPanPredictor(MHCPeptidePredictor):
     """MHCPeptidePredictor that calls a locally installed 
     netMHCIIpan instance."""
     
-    def init(self, **kwargs):
-        self.executable = kwargs.get("executable", "netMHCIIpan")
-        self.tempdir = kwargs.get("tempdir", None)
-
-    def getPeptidePredictions(self, sequences, alleles, species):
-        if len(sequences) == 0 or len(alleles) == 0:
-            # TODO: warn
-            return None
-        seq_lengths = sort_by_length(sequences)
-        rows_list = []
-        for seq_len, seqs in seq_lengths.items():
-            rows_list.extend(self._predict(seqs, [seq_len], alleles, species))
-        return self._prepare_DataFrame(rows_list)
+    def init(self, executable="netMHCIIpan", tempdir=None, **kwargs):
+        NetMHCPeptidePredictor.init(self, executable, tempdir, **kwargs)
     
-    def getProteinPredictions(self, sequences, lengths, alleles, species):
-        if len(sequences) == 0 or len(alleles) == 0:
-            # TODO: warn
-            return None
-        rows_list = self._predict(sequences, lengths, alleles, species)
-        return self._prepare_DataFrame(rows_list)
+    def _reformat_alleles(self, alleles):
+        return list(allele.split("-")[1].replace("*", "_") for allele in alleles)
     
-    def _predict(self, sequences, lengths, alleles, species):
-        alleles = list(allele.split("-")[1].replace("*", "_") for allele in alleles)
-        lengths = ",".join(map(str, lengths))
-        seq_file = create_temp_fasta(sequences, self.tempdir)
-
-        try:
-            return list(self._execute(seq_file, lengths, allele)
-                for allele in alleles)
-
-        finally:
-            os.remove(seq_file)
-        
-    def _execute(self, seq_file, lengths_str, allele):
-        cmd = [
-            self.executable, 
+    def _get_command(self, executable, seq_file, lengths_str, allele):
+        return [
+            executable, 
             "-length", lengths_str, 
             "-a", allele, 
             "-f", seq_file,
             "-tdir", self.tempdir
         ]
-        output = subprocess.check_output(cmd)
-        output = output.split("\n")[19:]
-        ignore = set(("Protein","pos",""))
 
-        def parse_row(row):
-            if not row.startswith("-"):
-                row = re.split("\s*", row.strip())[:9]
-                if len(row) == 9 and row[0] not in ignore:
-                    return row
-        
-        return filter(None, map(parse_row, output))
+    def _parse_output(self, output):
+        pass
     
     def _prepare_DataFrame(self, rows_list):
         df = rbind(rows_list)

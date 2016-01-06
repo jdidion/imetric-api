@@ -9,10 +9,10 @@ setup(
 
     version='0.1',
 
-    description='Interface to MHC prediction tools',
+    description='Interface to MHC and immunogenicity prediction tools',
 
     # The project's main homepage.
-    url='https://github.com/jdidion/mhcpredict',
+    url='https://github.com/jdidion/imetric-api',
 
     # Author details
     author='John Didion',
