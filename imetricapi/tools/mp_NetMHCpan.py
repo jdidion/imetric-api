@@ -1,13 +1,5 @@
-# TODO: refactor to move code that is common between
-# this and mp_NetMHCIIPan.py to a shared base class
-
 import csv
-import os
-import re
-import subprocess
-import pandas as pd
-from imetricapi.predict import MHCPeptidePredictor
-from imetricapi.util import create_temp_fasta, sort_by_length, rbind
+from .NetMHCbase import NetMHCPeptidePredictor
 
 def get_instance(config):
     #if IEDB locally installed
@@ -25,7 +17,7 @@ class LocalNetMHCPanPredictor(NetMHCPeptidePredictor):
     def _reformat_alleles(self, alleles):
         return list(allele.replace("*", "_") for allele in alleles)
     
-    def _get_command(self, executable, seq_file, lengths_str, allele):
+    def _get_predict_command(self, executable, seq_file, lengths_str, allele):
         return [
             executable, 
             "-l", lengths_str, 
@@ -34,55 +26,9 @@ class LocalNetMHCPanPredictor(NetMHCPeptidePredictor):
             "-tdir", self.tempdir
         ]
     
-    def _parse_output(self, output):
-        accuracies = []
-        summaries = []
-        rows = []
-        div_count = 0
-        
-        for row in output.split("\n"):
-            if row.startswith("#"):
-                continue
-            elif row.startswith("-"):
-                # we found a table divider row
-                div_count += 1
-            elif div_count == 0:
-                # we're before the table
-                accuracies.append(row)
-            elif div_count == 1:
-                # this is the header - ignore
-                pass
-            elif div_count == 2:
-                # we're in the main body of the table
-                rows.append(row)
-            else:
-                # we're after the table
-                summaries.append(row)
-        
-        return (
-            list(row[0:7] for row in
-                csv.reader(rows, delimiter=" ", skipinitialspace=True)),
-            accuracies, 
-            summaries
-        )
-    
-    def _prepare_DataFrame(self, rows_list):
-        df = rbind(rows_list)
-        df.columns = [
-            "pos", "allele", "peptide", "identity",
-            "1-log50k(aff)", "affinity", "rank"
-        ]
-        df = df.drop(["identity", "rank"], 1)
-        df["pos"] = pd.to_numeric(df["pos"], errors='coerce')
-        df["1-log50k(aff)"] = pd.to_numeric(df["1-log50k(aff)"], errors='coerce')
-        df["affinity"] = pd.to_numeric(df["affinity"], errors='coerce')
-        df = df.dropna()
-        df["rank"] = df["affinity"].rank(method="min", ascending=1)
+    def _reformat_DataFrame(self, df):
+        df.drop([3,6], 1)
         return df
     
-    def listMHCAlleles(self):
-        """Get available alleles"""
-        cmd = [self.executable, "-listMHC"]
-        temp = subprocess.check_output(cmd)
-        alleles = temp.split("\n")[34:]
-        return alleles
+    def _get_list_command(self, executable):
+        return [executable, "-listMHC"]

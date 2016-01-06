@@ -1,3 +1,7 @@
+import os
+import pandas as pd
+import subprocess
+from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
 class NetMHCPeptidePredictor(MHCPeptidePredictor):
     def init(self, executable, tempdir, **kwargs):
@@ -26,14 +30,69 @@ class NetMHCPeptidePredictor(MHCPeptidePredictor):
         lengths = ",".join(map(str, lengths))
         seq_file = create_temp_fasta(sequences, self.tempdir)
         
+        def _exec(allele):
+            cmd = self._get_predict_command(
+                self.executable, seq_file, lengths_str, allele)
+            output = subprocess.check_output(cmd)
+            return self._parse_predict_output(output)
+        
         try:
-            return list(self._execute(seq_file, lengths, allele)
-                for allele in alleles)
+            return list(self._execute(allele) for allele in alleles)
+        
         finally:
-            #os.remove(seq_file)
-            pass
+            os.remove(seq_file)
     
-    def _execute(self, seq_file, lengths_str, allele):
-        cmd = self._get_command(self.executable, seq_file, lengths_str, allele)
+    def _parse_predict_output(self, output):
+        headers = []
+        summaries = []
+        rows = []
+        div_count = 0
+        
+        for row in output.split("\n"):
+            if row.startswith("-"):
+                # we found a table divider row
+                div_count += 1
+            elif div_count == 0:
+                # we're before the table
+                headers.append(row)
+            elif div_count == 1:
+                # this is the header - ignore
+                pass
+            elif div_count == 2:
+                # we're in the main body of the table
+                rows.append(row)
+            else:
+                # we're after the table
+                summaries.append(row)
+        
+        return (
+            list(csv.reader(rows, delimiter=" ", skipinitialspace=True)),
+            headers, 
+            summaries
+        )
+    
+    def _prepare_DataFrame(self, rows_list):
+        df = rbind(rows_list)
+        df = self._reformat_data_frame(df)
+        df.colnames = [
+            "pos", "allele", "peptide", "identity", "core", 
+            "1-log50k(aff)", "affinity"
+        ]
+        df["pos"] = pd.to_numeric(df["pos"], errors='coerce')
+        df["1-log50k(aff)"] = pd.to_numeric(df["1-log50k(aff)"], errors='coerce')
+        df["affinity"] = pd.to_numeric(df["affinity"], errors='coerce')
+        df = df.dropna()
+        df["rank"] = df["affinity"].rank(method="min", ascending=1)
+        return df
+    
+    def listMHCAlleles(self):
+        """Get available alleles"""
+        cmd = self._get_list_command()
         output = subprocess.check_output(cmd)
-        return self.parse_output(output)
+        alleles = []
+        for row in output.split("\n"):
+            if row.startswith("#") or len(row.strip()) == 0:
+                continue
+            alleles.append(row)
+        return alleles
+        
