@@ -5,14 +5,14 @@ def find_scripts(script_dir):
     return [s for s in findall(script_dir) if os.path.splitext(s)[1] != '.pyc']
 
 setup(
-    name='mhcpredict',
+    name='imetric-api',
 
     version='0.1',
 
-    description='Interface to MHC prediction tools',
+    description='Interface to MHC and immunogenicity prediction tools',
 
     # The project's main homepage.
-    url='https://github.com/jdidion/mhcpredict',
+    url='https://github.com/jdidion/imetric-api',
 
     # Author details
     author='John Didion',
