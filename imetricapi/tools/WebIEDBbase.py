@@ -64,7 +64,8 @@ class WebIEDBbase(object):
                 
         to_rename = set(df.columns) - set("allele","peptide")
         if len(to_rename) > 0:
-            df = df.rename(dict((col, "{0}_{1}".format(name, col)) 
+            df = df.rename(columns=dict((col, "{0}_{1}".format(name, col))
+                for col in to_rename)) 
         
         return df
     

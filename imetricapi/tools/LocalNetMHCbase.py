@@ -1,6 +1,9 @@
+import csv
 import os
 import pandas as pd
 import subprocess
+
+from imetricapi.predict import MHCPeptidePredictor
 from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
 class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
@@ -22,18 +25,17 @@ class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
         return self._prepare_DataFrame(list(result[0] for result in results))
     
     def _predict(self, sequences, lengths, alleles, species):
-        alleles = self._reformat_alleles(alleles)
-        lengths = ",".join(map(str, lengths))
+        lengths_str = ",".join(map(str, lengths))
         seq_file = create_temp_fasta(sequences, self.tempdir)
         
         def _exec(allele):
             cmd = self._get_predict_command(
                 self.executable, seq_file, lengths_str, allele)
-            output = subprocess.check_output(cmd)
+            output = subprocess.check_output(cmd, universal_newlines=True)
             return self._parse_predict_output(output)
         
         try:
-            return list(self._execute(allele) for allele in alleles)
+            return list(_exec(allele) for allele in alleles)
         
         finally:
             os.remove(seq_file)
@@ -69,8 +71,8 @@ class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
     
     def _prepare_DataFrame(self, rows_list):
         df = rbind(rows_list)
-        df = self._reformat_data_frame(df)
-        df.colnames = [
+        df = self._reformat_DataFrame(df)
+        df.columns = [
             "pos", "allele", "peptide", "identity", 
             "1-log50k(aff)", "affinity"
         ]
@@ -83,8 +85,8 @@ class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
     
     def listMHCAlleles(self):
         """Get available alleles"""
-        cmd = self._get_list_command()
-        output = subprocess.check_output(cmd)
+        cmd = self._get_list_command(self.executable)
+        output = subprocess.check_output(cmd, universal_newlines=True)
         alleles = []
         for row in output.split("\n"):
             if row.startswith("#") or len(row.strip()) == 0:

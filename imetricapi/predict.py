@@ -144,6 +144,7 @@ class MHCPeptidePredictor(Predictor):
             if isinstance(alleles, str):
                 alleles = [alleles]
             
+            alleles = self.reformat_alleles(alleles)
             valid_alleles = set(alleles) & set(all_alleles)
             invalid_alleles = set(alleles) - valid_alleles
             if len(invalid_alleles) > 0:
@@ -199,6 +200,12 @@ class MHCPeptidePredictor(Predictor):
     
     def getProteinPredictions(self, sequences, lengths, alleles, species, **kwargs):
         raise NotImplemented()
+    
+    def reformat_alleles(self, alleles):
+        """Modify alleles input by the user so that they are in
+        the same format as the database being queried.
+        """
+        return alleles
     
     def listMHCAlleles(self):
         raise NotImplemented()

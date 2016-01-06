@@ -16,7 +16,7 @@ class LocalNetMHCPanPredictor(LocalNetMHCPeptidePredictor):
         self.attr.setdefault("executable", "netMHCpan")
         self.attr.setdefault("tempdir", None)
     
-    def _reformat_alleles(self, alleles):
+    def reformat_alleles(self, alleles):
         return list(allele.replace("*", "_") for allele in alleles)
     
     def _get_predict_command(self, executable, seq_file, lengths_str, allele):
@@ -29,8 +29,7 @@ class LocalNetMHCPanPredictor(LocalNetMHCPeptidePredictor):
         ]
     
     def _reformat_DataFrame(self, df):
-        df.drop([6], 1)
-        return df
+        return df.drop([6], 1)
     
     def _get_list_command(self, executable):
         return [executable, "-listMHC"]

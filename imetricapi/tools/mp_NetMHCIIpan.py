@@ -1,4 +1,4 @@
-from .NetMHCbase import LocalNetMHCPeptidePredictor
+from .LocalNetMHCbase import LocalNetMHCPeptidePredictor
 
 def get_instance(config):
     #if IEDB locally installed
@@ -15,7 +15,7 @@ class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
         self.attr.setdefault("executable", "netMHCIIpan")
         self.attr.setdefault("tempdir", None)
         
-    def _reformat_alleles(self, alleles):
+    def reformat_alleles(self, alleles):
         return list(allele.split("-")[1].replace("*", "_") for allele in alleles)
     
     def _get_predict_command(self, executable, seq_file, lengths_str, allele):
@@ -28,8 +28,7 @@ class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
         ]
     
     def _reformat_DataFrame(self, df):
-        df.drop([4,5,6,9,10,11], 1)
-        return df
+        return df.drop([4,5,6,9,10,11], 1)
         
     def _get_list_command(self, executable):
         return [executable, "-list"]
