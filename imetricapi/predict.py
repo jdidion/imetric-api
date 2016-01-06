@@ -37,6 +37,12 @@ class Predictor(object):
     def __getattr__(self, attr):
         return self.attr[attr]
     
+    def can_execute(self):
+        """Should be overridden by subclasses to test whether 
+        necessary resources are available.
+        """
+        return True
+    
     def get_info(self):
         return self.attr.copy()
 
@@ -237,7 +243,7 @@ class MHCImmunoPredictor(Predictor):
         sequences = self._validate_args(sequences)
         self.getEpitopePredictions(sequences)
     
-    def _validate_args(self, sequences, alleles, species, min_seq_len=None, max_seq_len=None):
+    def _validate_args(self, sequences):
         if sequences is None or len(sequences) == 0:
             raise Exception("No sequences given")
         if isinstance(sequences, str):

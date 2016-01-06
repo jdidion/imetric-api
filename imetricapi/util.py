@@ -3,7 +3,17 @@ from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 import pandas as pd
 from collections import defaultdict
+import subprocess
 import tempfile
+
+def check_executable(path):
+    try:
+        subprocess.check_output(path)
+    except (FileNotFoundError, OSError):
+        return False
+    except:
+        pass
+    return True
 
 def create_temp_fasta(sequences, tempdir=None):
     if isinstance(sequences, str):

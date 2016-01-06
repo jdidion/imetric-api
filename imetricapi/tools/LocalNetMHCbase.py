@@ -4,9 +4,12 @@ import pandas as pd
 import subprocess
 
 from imetricapi.predict import MHCPeptidePredictor
-from imetricapi.util import create_temp_fasta, sort_by_length, rbind
+from imetricapi.util import create_temp_fasta, sort_by_length, rbind, check_executable
 
 class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
+    def can_execute(self):
+        return check_executable(self.executable)
+    
     def getPeptidePredictions(self, sequences, alleles, species):
         if len(sequences) == 0 or len(alleles) == 0:
             # TODO: warn

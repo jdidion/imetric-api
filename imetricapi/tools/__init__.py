@@ -8,15 +8,17 @@ import imetricapi
 import imetricapi.util
 
 def get_MHCPeptidePredictors(names=None, mhc_class=None, config=None):
-    return _get_predictors("mp", names, mhc_class, config)
-
-def get_MHCImmunoPredictors(names=None, mhc_class=None, config=None):
-    return _get_predictors("ep", names, mhc_class, config)
-
-def _get_predictors(predictor_type, names, mhc_class, config):
-    predictors = ToolLoader(predictor_type).get_predictors(names, config)
+    predictors = _get_predictors("mp", names, config)
     if mhc_class is not None:
-        predictors = filter(lambda p: p.supports_class(mhc_class), predictors)
+        predictors = { k:v for (k,v) in predictors.items() if v.supports_class(mhc_class) }
+    return predictors
+
+def get_MHCImmunoPredictors(names=None, config=None):
+    return _get_predictors("ep", names, config)
+
+def _get_predictors(predictor_type, names, config):
+    predictors = ToolLoader(predictor_type).get_predictors(names, config)
+    predictors = { k:v for (k,v) in predictors.items() if v.can_execute() }
     return predictors
 
 class ToolLoader(object):
