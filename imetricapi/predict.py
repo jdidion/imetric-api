@@ -1,22 +1,24 @@
 import imetricapi.tools
 
-def predictPeptides(sequences, alleles=None, species=None, 
-                    methods=None, config=None, **kwargs):
-    
-    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, config)
-    results = dict((name, pred.predictPeptides(sequences, alleles, species, **kwargs))
-        for name, pred in predictors.items())
+def predictPeptides(sequences, alleles=None, species=None, methods=None, 
+                    mhc_classes=None, config=None, **kwargs):
+    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, mhc_classes, config)
+    results = {}
+    for name, pred in predictors.items():
+        pred_result = pred.predictPeptides(sequences, alleles, species, **kwargs)
+        results[name] = pred.get_info()
+        results[name]["result"] = pred_result
     return results
-    # TODO: generate consensus table from results
 
 def predictProteins(sequences, lengths=None, alleles=None, species=None, 
-                    methods=None, config=None, **kwarg):
-    
-    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, config)
-    results = dict((name, pred.predictProteins(sequences, lengths, alleles, species, **kwargs))
-        for name, pred in predictors.items())
+                    methods=None, mhc_classes=None, config=None, **kwarg):
+    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, mhc_classes, config)
+    results = {}
+    for name, pred in predictors.items():
+        pred_result = pred.predictProteins(sequences, lengths, alleles, species, **kwargs)
+        results[name] = pred.get_info()
+        results[name]["result"] = pred_result
     return results
-    # TODO: generate consensus table from results
 
 class MHCPeptidePredictor(object):
     """Base class for tools that predict MHC:peptide binding strength.
@@ -25,9 +27,21 @@ class MHCPeptidePredictor(object):
         # set defaults that can be over-ridden by subclass init()
         self.all_alleles = None
         self.all_species = None
-        self.min_peptide_length = 8
-        self.max_peptide_length = 15
-        self.init(**kwargs)
+        self.attr = dict(
+            min_peptide_length=8,
+            max_peptide_length=15,
+            mhc=(1,2)
+        )
+        self.attr.update(kwargs)
+    
+    def __getattr__(self, attr):
+        return self.attr[attr]
+    
+    def get_info(self):
+        return self.attr.copy()
+    
+    def supports_class(self, mhc_class):
+        return mhc_class in self.mhc
     
     def predictPeptides(self, sequences, alleles=None, species=None, **kwargs):
         """Predict binding between one or more peptide and one or more MHC alleles.
@@ -41,7 +55,13 @@ class MHCPeptidePredictor(object):
         
         Returns:
             A pandas DataFrame with the following columns:
-            TODO
+            
+            1. pos: start position of the core sequence within the peptide
+            2. allele: MHC allele name
+            3. peptide: peptide sequence
+            4. identity: name of the peptide
+            5. 1-log50k(affinity)
+            6. Affinity (nM)
         """
         sequences, alleles, species = self._validate_args(sequences, alleles, species,
             self.min_peptide_length, self.max_peptide_length)
@@ -64,7 +84,13 @@ class MHCPeptidePredictor(object):
         
         Returns:
             A pandas DataFrame with the following columns:
-            TODO
+            
+            1. pos: start position of the core sequence within the peptide
+            2. allele: MHC allele name
+            3. peptide: peptide sequence
+            4. identity: name of the peptide
+            5. 1-log50k(affinity)
+            6. Affinity (nM)
         """
         sequences, alleles, species = self._validate_args(sequences, alleles, species,
             self.min_peptide_length)
@@ -178,6 +204,14 @@ def predictEpitopes(sequences, methods=None, config=None, **kwargs):
     # TODO: generate consensus table from results
 
 class MHCImmunoPredictor(object):
+    def __init__(self, **kwargs):
+        self.attr = dict(
+            min_peptide_length=8,
+            max_peptide_length=15,
+            mhc=(1,2)
+        )
+        self.attr.update(kwargs)
+    
     def predictEpitopes(self, sequences, **kwargs):
         """Predict immunogenicity of one or more epitopes.
         

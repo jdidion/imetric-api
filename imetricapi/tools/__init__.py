@@ -7,11 +7,17 @@ import sys
 import imetricapi
 import imetricapi.util
 
-def get_MHCPeptidePredictors(names=None, config=None):
-    return ToolLoader("mp").get_predictors(names, config)
+def get_MHCPeptidePredictors(names=None, mhc_class=None, config=None):
+    return _get_predictors("mp", names, mhc_class, config)
 
-def get_MHCImmunoPredictors(names=None, config=None):
-    return ToolLoader("ep").get_predictors(names, config)
+def get_MHCImmunoPredictors(names=None, mhc_class=None, config=None):
+    return _get_predictors("ep", names, mhc_class, config)
+
+def _get_predictors(predictor_type, names, mhc_class, config):
+    predictors = ToolLoader(predictor_type).get_predictors(names, config)
+    if mhc_class is not None:
+        predictors = filter(lambda p: p.supports_class(mhc_class), predictors)
+    return predictors
 
 class ToolLoader(object):
     def __init__(self, prefix):

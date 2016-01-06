@@ -11,8 +11,9 @@ class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
     netMHCIIpan instance."""
     
     def init(self, executable="netMHCIIpan", tempdir=None, **kwargs):
-        NetMHCPeptidePredictor.init(self, executable, tempdir, **kwargs)
-    
+        LocalNetMHCPeptidePredictor.init(self, executable, tempdir, **kwargs)
+        self.attr["mhc"] = (2,)
+        
     def _reformat_alleles(self, alleles):
         return list(allele.split("-")[1].replace("*", "_") for allele in alleles)
     
@@ -26,7 +27,7 @@ class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
         ]
     
     def _reformat_DataFrame(self, df):
-        df.drop([3,4,5,6,9,10,11], 1)
+        df.drop([4,5,6,9,10,11], 1)
         return df
         
     def _get_list_command(self, executable):

@@ -5,8 +5,8 @@ from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
 class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
     def init(self, executable, tempdir, **kwargs):
-        self.executable = executable
-        self.tempdir = tempdir
+        self.attr["executable"] = executable
+        self.attr["tempdir"] = tempdir
     
     def getPeptidePredictions(self, sequences, alleles, species):
         if len(sequences) == 0 or len(alleles) == 0:
@@ -75,7 +75,7 @@ class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
         df = rbind(rows_list)
         df = self._reformat_data_frame(df)
         df.colnames = [
-            "pos", "allele", "peptide", "identity", "core", 
+            "pos", "allele", "peptide", "identity", 
             "1-log50k(aff)", "affinity"
         ]
         df["pos"] = pd.to_numeric(df["pos"], errors='coerce')
