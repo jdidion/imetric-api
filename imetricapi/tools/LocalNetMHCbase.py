@@ -3,7 +3,7 @@ import pandas as pd
 import subprocess
 from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
-class NetMHCPeptidePredictor(MHCPeptidePredictor):
+class LocalNetMHCPeptidePredictor(MHCPeptidePredictor):
     def init(self, executable, tempdir, **kwargs):
         self.executable = executable
         self.tempdir = tempdir

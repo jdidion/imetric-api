@@ -1,4 +1,4 @@
-from .NetMHCbase import NetMHCPeptidePredictor
+from .NetMHCbase import LocalNetMHCPeptidePredictor
 
 def get_instance(config):
     #if IEDB locally installed
@@ -6,7 +6,7 @@ def get_instance(config):
     #else
     #   return WebNetMHCIIPanPredictor(config)
 
-class LocalNetMHCIIPanPredictor(NetMHCPeptidePredictor):
+class LocalNetMHCIIPanPredictor(LocalNetMHCPeptidePredictor):
     """MHCPeptidePredictor that calls a locally installed 
     netMHCIIpan instance."""
     
