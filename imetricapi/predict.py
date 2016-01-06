@@ -192,7 +192,7 @@ class MHCImmunoPredictor(object):
         sequences = self._validate_args(sequences)
         self.getEpitopePredictions(sequences)
     
-    def _validate_args(self, sequences, alleles, species, min_seq_len=None, max_seq_len=None):
+    def _validate_args(self, sequences):
         if sequences is None or len(sequences) == 0:
             raise Exception("No sequences given")
         if isinstance(sequences, str):
@@ -202,3 +202,13 @@ class MHCImmunoPredictor(object):
     ## Internal methods to be implemented by subclasses ##
     def getEpitopePredictions(self, sequences, **kwargs):
         raise NotImplemented()
+
+
+    def init(self, **kwargs):
+        pass
+
+
+    def __init__(self, **kwargs):
+        # set defaults that can be over-ridden by subclass init()
+        self.init(**kwargs)
+
