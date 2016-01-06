@@ -5,7 +5,7 @@ def find_scripts(script_dir):
     return [s for s in findall(script_dir) if os.path.splitext(s)[1] != '.pyc']
 
 setup(
-    name='mhcpredict',
+    name='imetricapi',
 
     version='0.1',
 

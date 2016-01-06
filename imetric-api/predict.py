@@ -1,9 +1,9 @@
-import mhcpredict.tools
+import imetricapi.tools
 
 def predictPeptides(sequences, alleles=None, species=None, 
                     methods=None, config=None, **kwargs):
     
-    predictors = mhcpredict.tools.get_MHCPeptidePredictors(methods, config)
+    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, config)
     results = dict((name, pred.predictPeptides(sequences, alleles, species, **kwargs))
         for name, pred in predictors.items())
     return results
@@ -12,7 +12,7 @@ def predictPeptides(sequences, alleles=None, species=None,
 def predictProteins(sequences, lengths=None, alleles=None, species=None, 
                     methods=None, config=None, **kwarg):
     
-    predictors = mhcpredict.tools.get_MHCPeptidePredictors(methods, config)
+    predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, config)
     results = dict((name, pred.predictProteins(sequences, lengths, alleles, species, **kwargs))
         for name, pred in predictors.items())
     return results
@@ -171,7 +171,7 @@ class MHCPeptidePredictor(object):
         return []
 
 def predictEpitopes(sequences, methods=None, config=None, **kwargs):
-    predictors = mhcpredict.tools.get_MHCImmunoPredictors(methods, config)
+    predictors = imetricapi.tools.get_MHCImmunoPredictors(methods, config)
     results = dict((name, pred.predictEpitopes(sequences, **kwargs))
         for name, pred in predictors.items())
     return results

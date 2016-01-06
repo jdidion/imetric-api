@@ -4,8 +4,8 @@ import importlib
 import os
 import sys
 
-import mhcpredict
-import mhcpredict.util
+import imetricapi
+import imetricapi.util
 
 def get_MHCPeptidePredictors(names=None, config=None):
     return ToolLoader("mp").get_predictors(names, config)
@@ -30,7 +30,7 @@ class ToolLoader(object):
             A list of MHCPeptidePredictors
         """
         if config is None:
-            config = mhcpredict.util.DictConfig()
+            config = imetricapi.util.DictConfig()
         
         modules = self.get_modules()
     
@@ -54,13 +54,13 @@ class ToolLoader(object):
         if self.all_modules is None:
             
             mod_dir = os.path.join(
-                os.path.dirname(os.path.abspath(mhcpredict.__file__)), 
+                os.path.dirname(os.path.abspath(imetricapi.__file__)), 
                 "tools"
             )
             
             #if sys.version_info >= (3, 4):
             #    import importlib.util
-            #    spec = importlib.util.find_spec("mhcpredict.tools")
+            #    spec = importlib.util.find_spec("imetricapi.tools")
             #    mod_dir = spec.submodule_search_locations[0]
             
             #elif sys.version_info < (3, 0):
@@ -73,7 +73,7 @@ class ToolLoader(object):
             ))
             self.all_modules = dict((
                     mod_name[(len(self.prefix)+1):], 
-                    importlib.import_module("."+mod_name, package="mhcpredict.tools")
+                    importlib.import_module("."+mod_name, package="imetricapi.tools")
                 )
                 for mod_name in mod_names)
 

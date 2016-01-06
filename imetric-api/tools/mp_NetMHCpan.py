@@ -6,8 +6,8 @@ import os
 import re
 import subprocess
 import pandas as pd
-from mhcpredict.predict import MHCPeptidePredictor
-from mhcpredict.util import create_temp_fasta, sort_by_length, rbind
+from imetricapi.predict import MHCPeptidePredictor
+from imetricapi.util import create_temp_fasta, sort_by_length, rbind
 
 def get_instance(config):
     #if IEDB locally installed
