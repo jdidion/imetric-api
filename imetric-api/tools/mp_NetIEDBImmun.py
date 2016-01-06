@@ -25,7 +25,7 @@ class LocalIEDBImmunPredictor(MHCImmunoPredictor):
         seq_lengths = sort_by_length(sequences)
         rows_list = []
 #        for seq_len, seqs in seq_lengths.items():
-            rows_list.extend(self._predict(seqs))
+        rows_list.extend(self._predict(seqs))
         return self._prepare_DataFrame(rows_list)
 
 
