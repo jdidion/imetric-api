@@ -11,7 +11,7 @@ def predictPeptides(sequences, alleles=None, species=None, methods=None,
     return results
 
 def predictProteins(sequences, lengths=None, alleles=None, species=None, 
-                    methods=None, mhc_classes=None, config=None, **kwarg):
+                    methods=None, mhc_classes=None, config=None, **kwargs):
     predictors = imetricapi.tools.get_MHCPeptidePredictors(methods, mhc_classes, config)
     results = {}
     for name, pred in predictors.items():

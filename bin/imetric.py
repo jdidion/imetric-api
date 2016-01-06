@@ -16,8 +16,9 @@ if __name__ == "__main__":
     
 import imetricapi.predict
 import imetricapi.util    
-result = imetricapi.predict.predictPeptides(
+result = imetricapi.predict.predictProteins(
     "VIFRLMRTNFL",
+    lengths=(9,),
     alleles="HLA-DRB1*0101",
     methods=["NetMHCIIpan"],
     config=imetricapi.util.DictConfig(dict(NetMHCIIpan=dict(
@@ -27,8 +28,9 @@ result = imetricapi.predict.predictPeptides(
 
 import imetricapi.predict
 import imetricapi.util    
-result = imetricapi.predict.predictPeptides(
+result = imetricapi.predict.predictProteins(
     "VIFRLMRTNFL",
+    lengths=(9,),
     alleles="HLA-A01:01",
     methods=["NetMHCpan"],
     config=imetricapi.util.DictConfig(dict(NetMHCpan=dict(
