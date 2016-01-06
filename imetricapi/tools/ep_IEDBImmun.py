@@ -1,19 +1,19 @@
 # TODO: refactor to move code that is common between
 # this and mp_NetMHCIIPan.py to a shared base class
 
-from imetricapi.predict import MHCPeptidePredictor
+from imetricapi.predict import MHCImmunoPredictor
 from imetricapi.util import create_temp_fasta, sort_by_length
 import os
 import subprocess
 
 def get_instance(config):
     #if IEDB locally installed
-    return LocalNetMHCPanPredictor(**config.get_section("IEDBImmun"))
+    return LocalIEDBImmunPredictor(**config.get_section("IEDBImmun"))
     #else
     #   return WebNetMHCIIPanPredictor(config)
 
 class LocalIEDBImmunPredictor(MHCImmunoPredictor):
-    """MHCImmunoPredictor that calls a locally installed 
+    """IEDBImmunoPredictor that calls a locally installed 
     IEDB Immunonecity tool local instance."""
     
     def init(self, **kwargs):
