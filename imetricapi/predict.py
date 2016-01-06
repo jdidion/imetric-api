@@ -80,7 +80,7 @@ class MHCPeptidePredictor(Predictor):
             3. peptide: peptide sequence
             4. identity: name of the peptide
             5. 1-log50k(affinity)
-            6. Affinity (nM)
+            6. affinity (nM)
         """
         sequences, alleles, species = self._validate_args(sequences, alleles, species,
             self.min_peptide_length, self.max_peptide_length)
