@@ -12,6 +12,10 @@ Generate MHC:peptide binding predictions for every available MHC allele in every
 result = imetricapi.predict.predictPeptides("VIFRLMRTNFL")
 ```
 
+# TODO
+
+* Refactor ToolLoader to be able to load modules from third-party packages.
+
 # To evaluate
 
 * http://boson.research.microsoft.com/bio/epipred.aspx
