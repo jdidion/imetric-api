@@ -4,6 +4,10 @@ IMETRIC (Immunogenicity METa pRedICtion) is a web framework for running MHC:pept
 
 The IMETRIC API was originally based on MHCpredict: https://github.com/dmnfarrell/mhcpredict
 
+# A Note on FRED-2
+
+Recently, a similar API was published in Bioinformatics: https://github.com/FRED-2/Fred2. We will consider using FRED-2 as the backend for iMetric, and contributing any code from our API that might improve FRED-2.
+
 # Usage
 
 Generate MHC:peptide binding predictions for every available MHC allele in every supported database.
